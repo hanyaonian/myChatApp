@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.dell.wilddogchat.R;
+import com.hyphenate.chat.EMClient;
 
 import entity.User;
 
@@ -19,20 +20,28 @@ public class SplashActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                {
-                    if (User.getInstance().isLogin() == false) {
-                        try {
-                            Thread.sleep(sleepTime);
-                        } catch (InterruptedException e) {
+        if (EMClient.getInstance().isLoggedInBefore()) {
+            EMClient.getInstance().chatManager().getAllConversations();
+            EMClient.getInstance().groupManager().getAllGroups();
+            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    {
+                        if (User.getInstance().isLogin() == false) {
+                            try {
+                                Thread.sleep(sleepTime);
+                            } catch (InterruptedException e) {
+                            }
+                            startActivity(new Intent(SplashActivity.this, userlogin.class));
+                            finish();
                         }
-                        startActivity(new Intent(SplashActivity.this, userlogin.class));
-                        finish();
                     }
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 }

@@ -17,6 +17,7 @@ public class chatApplication extends Application {
         EMOptions options = new EMOptions();
         //需要好友验证
         options.setAcceptInvitationAlways(false);
+        options.setAutoLogin(true);
         EMClient.getInstance().init(getApplicationContext(), options);
         EMClient.getInstance().setDebugMode(true);
     }

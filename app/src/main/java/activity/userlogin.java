@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +14,10 @@ import android.widget.Toast;
 import com.example.dell.wilddogchat.R;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class userlogin extends BaseActivity {
 
@@ -57,10 +62,17 @@ public class userlogin extends BaseActivity {
     //需要一个加载dialog，不然会有傻逼一直点登录
     public void userlogin(final String username, final String password){
         dialog = ProgressDialog
-                .show(this, "登录中", "正在进行连接", false);
+                .show(this, "登录中", "正在进行连接", true);
         EMClient.getInstance().login(username, password, new EMCallBack(){
             @Override
             public void onSuccess() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "login", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
                 Intent intent = new Intent(userlogin.this, MainActivity.class);
@@ -107,5 +119,12 @@ public class userlogin extends BaseActivity {
         } else {
             Toast.makeText(getApplicationContext(), "再次返回退出", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EMClient.getInstance().logout(true);
+        //if (dialog.isShowing()) dialog.dismiss();
     }
 }
