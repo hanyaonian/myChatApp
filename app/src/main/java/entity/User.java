@@ -8,6 +8,7 @@ package entity;
 public class User {
     private static User instance;
     private boolean isLogin;
+    private String userName;
     private void User() {
         isLogin = false;
     }
@@ -22,6 +23,8 @@ public class User {
             }
         }
     }
+    public String getUserName() {return userName;}
+    public void setUserName(String Username) {userName = Username;}
     public boolean isLogin() {
         return isLogin;
     }

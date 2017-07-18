@@ -96,7 +96,6 @@ public class MainActivity extends BaseActivity{
     @Override
     protected void onStop() {
         super.onStop();
-       // EMClient.getInstance().logout(true);
     }
     //双击退出
     private long[] mHits = new long[2];

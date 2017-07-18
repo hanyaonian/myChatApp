@@ -21,8 +21,8 @@ public class SplashActivity extends Activity {
     protected void onStart() {
         super.onStart();
         if (EMClient.getInstance().isLoggedInBefore()) {
-            EMClient.getInstance().chatManager().getAllConversations();
-            EMClient.getInstance().groupManager().getAllGroups();
+            EMClient.getInstance().chatManager().loadAllConversations();
+            EMClient.getInstance().groupManager().loadAllGroups();
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -35,6 +35,7 @@ public class SplashActivity extends Activity {
                             try {
                                 Thread.sleep(sleepTime);
                             } catch (InterruptedException e) {
+
                             }
                             startActivity(new Intent(SplashActivity.this, userlogin.class));
                             finish();

@@ -1,5 +1,6 @@
 package fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import activity.conversation;
 import adapter.ContactListAdapter;
 import ui.IndexSlideBar;
 
@@ -59,6 +62,7 @@ public class Contact extends Fragment {
     }
     public void bindView(View view) {
         contactList = (ListView)view.findViewById(R.id.contact_list);
+        contactList.setOnItemClickListener(contact_item_click);
         textDialog = (TextView)view.findViewById(R.id.text_dialog);
         indexSlideBar = (IndexSlideBar)view.findViewById(R.id.index_slideBar);
         indexSlideBar.setTextView(textDialog);
@@ -66,6 +70,7 @@ public class Contact extends Fragment {
         indexSlideBar.setOnTouchingLetterChangedListener(new IndexSlideBar.OnTouchingLetterChangedListener() {
             @Override
             public void onTouchingLetterChanged(String s) {
+                if (adapter == null) return;
                 int position = adapter.getFirstLetterPos(s.charAt(0));
                 if (position != -1) {
                     contactList.setSelection(position);
@@ -110,4 +115,12 @@ public class Contact extends Fragment {
         adapter = new ContactListAdapter(getActivity().getApplicationContext(), friend_list);
         contactList.setAdapter(adapter);
     }
+    private AdapterView.OnItemClickListener contact_item_click = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Intent intent = new Intent(getActivity(), conversation.class);
+            intent.putExtra("talkWithWho", friend_list.get(position));
+            startActivity(intent);
+        }
+    };
 }

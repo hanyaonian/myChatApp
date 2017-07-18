@@ -2,12 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/head_img"
-        app:srcCompat="@drawable/person"
         android:layout_width="0dp"
         android:layout_weight="3"
         android:layout_height="50dp"
@@ -15,29 +13,31 @@
         android:layout_margin="@dimen/dp8"
         android:textAppearance="?attr/textAppearanceListItem" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_weight="10"
         android:orientation="vertical"
-        android:layout_margin="@dimen/dp8"
         android:layout_height="match_parent">
         <TextView
             android:id="@+id/chat_nickName"
             android:textColor="@color/bad_black"
-            android:text="姚午言"
+            android:layout_marginTop="@dimen/dp8"
+            android:textSize="@dimen/dp16"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/latest_message"
+            android:layout_marginBottom="@dimen/dp16"
+            android:layout_alignParentBottom="true"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="哈哈哈哈哈哈啊哈哈哈啊哈啊"
             android:textColor="@color/deep_gray" />
-    </LinearLayout>
+    </RelativeLayout>
     <TextView
         android:id="@+id/latest_message_date"
-        android:text="6月15号"
         android:layout_marginTop="@dimen/dp5"
         android:layout_width="0dp"
         android:layout_weight="3"
