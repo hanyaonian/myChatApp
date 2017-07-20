@@ -1,19 +1,23 @@
 package fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.dell.wilddogchat.R;
+import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
@@ -28,6 +32,8 @@ import ui.IndexSlideBar;
 public class Contact extends Fragment {
     private ListView contactList;
     private static final int GET_FRIEND_LIST = 1;
+    private static final int HEADER_COUNT = 2;
+    private static int UNREAD_FRIEND_INVITE = 0;
     private List<String> friend_list;
     private ContactListAdapter adapter;
     private IndexSlideBar indexSlideBar;
@@ -60,20 +66,27 @@ public class Contact extends Fragment {
         bindView(view);
         return view;
     }
+    public void addHeaderView() {
+        View contactList_header_new = LayoutInflater.from(getContext()).inflate(R.layout.contact_header_new, null);
+        View contactList_header_add = LayoutInflater.from(getContext()).inflate(R.layout.contact_header_add, null);
+        contactList.addHeaderView(contactList_header_add);
+        contactList.addHeaderView(contactList_header_new);
+    }
     public void bindView(View view) {
         contactList = (ListView)view.findViewById(R.id.contact_list);
         contactList.setOnItemClickListener(contact_item_click);
         textDialog = (TextView)view.findViewById(R.id.text_dialog);
         indexSlideBar = (IndexSlideBar)view.findViewById(R.id.index_slideBar);
         indexSlideBar.setTextView(textDialog);
-
+        //headerView
+        addHeaderView();
         indexSlideBar.setOnTouchingLetterChangedListener(new IndexSlideBar.OnTouchingLetterChangedListener() {
             @Override
             public void onTouchingLetterChanged(String s) {
                 if (adapter == null) return;
                 int position = adapter.getFirstLetterPos(s.charAt(0));
                 if (position != -1) {
-                    contactList.setSelection(position);
+                    contactList.setSelection(position+HEADER_COUNT);
                 }
             }
         });
@@ -115,12 +128,100 @@ public class Contact extends Fragment {
         adapter = new ContactListAdapter(getActivity().getApplicationContext(), friend_list);
         contactList.setAdapter(adapter);
     }
+    public void showAddFriendDialog() {
+        final View friend_name_text = LayoutInflater.from(getContext()).inflate(R.layout.add_friend_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("添加好友")
+                .setIcon(R.drawable.add_user)
+                .setView(friend_name_text)
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //- -
+                    }
+                })
+                .setPositiveButton("添加", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //add friend
+                        EditText name = (EditText) friend_name_text.findViewById(R.id.add_friend_name);
+                        EditText reason = (EditText) friend_name_text.findViewById(R.id.add_friend_reason);
+                        String friend_name = name.getText().toString();
+                        String add_reason = reason.getText().toString();
+                        addFriend(friend_name, add_reason);
+                    }
+                })
+                .setCancelable(true);
+        AlertDialog add_friend_dialog = builder.create();
+        add_friend_dialog.show();
+    }
+    public void addFriend(String name, String reason) {
+        try {
+            EMClient.getInstance().contactManager().addContact(name, reason);
+        }catch (HyphenateException e) {
+            Log.e(e.getErrorCode()+":" , e.getMessage() );
+        }
+    }
+    //listView Listener
     private AdapterView.OnItemClickListener contact_item_click = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(getActivity(), conversation.class);
-            intent.putExtra("talkWithWho", friend_list.get(position));
-            startActivity(intent);
+            if (position == 0) {
+                showAddFriendDialog();
+            } else if (position == 1) {
+
+            } else {
+                Intent intent = new Intent(getActivity(), conversation.class);
+                intent.putExtra("talkWithWho", friend_list.get(position - HEADER_COUNT));
+                startActivity(intent);
+            }
         }
     };
+    //contact listener
+    private EMContactListener contactListener = new EMContactListener() {
+        @Override
+        public void onContactAdded(String username) {
+            //增加了联系人时回调此方法
+            //TODO:无首字母时插入
+            //根据首字母插入新好友。。
+            String Username = username.substring(0,1).toUpperCase() + username.substring(1);
+            friend_list.add(adapter.getFirstLetterPos(username.toUpperCase().charAt(0)), Username);
+            adapter.notifyDataSetChanged();
+        }
+        @Override
+        public void onContactDeleted(String username) {
+            //TODO:被删除时回调此方法
+            friend_list.remove(username);
+            adapter.notifyDataSetChanged();
+        }
+        @Override
+        public void onContactInvited(String username, String reason) {
+            //发起加为好友用户的名称
+            //对方发起好友邀请时发出的文字性描述
+            UNREAD_FRIEND_INVITE += 1;
+            TextView shit = (TextView) getView().findViewById(R.id.unread_new_friend_num);
+            shit.setText(UNREAD_FRIEND_INVITE);
+            shit.setVisibility(View.VISIBLE);
+        }
+        @Override
+        public void onFriendRequestAccepted(String username) {
+            //增加了联系人时回调此方法
+        }
+        @Override
+        public void onFriendRequestDeclined(String username) {
+            //被拒绝时的方法
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        EMClient.getInstance().contactManager().setContactListener(contactListener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().contactManager().removeContactListener(contactListener);
+    }
 }

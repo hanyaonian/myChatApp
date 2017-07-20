@@ -2,9 +2,11 @@
 <resources>
     <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="deep_gray">#797474</color>>
-    <color name="colorAccent">#FF4081</color>
-    <color name="bad_black">#000000</color>>
+    <color name="deep_gray">#797474</color>
+    <color name="gray">#a6a6a6</color>>
+    <color name="colorAccent">#000000</color>
+    <color name="bad_black">#000000</color>
+    <color name="red">#ff6c6c</color>>
 
     <color name="black_overlay">#66000000</color>
 </resources>

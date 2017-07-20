@@ -3,7 +3,7 @@ package activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,7 +34,24 @@ public class conversation extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //返回按键
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
+    //返回按键监听
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish(); // back button
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_conversation);
@@ -68,7 +85,6 @@ public class conversation extends BaseActivity {
                 EMClient.getInstance().chatManager().sendMessage(message);
                 messages.add(message);
                 conversationListAdapter.notifyDataSetChanged();
-                message_list.setSelection(messages.size()-1);
             }
         }
     };
@@ -123,7 +139,6 @@ public class conversation extends BaseActivity {
                     EMMessage recieved_msg = (EMMessage) msg.obj;
                     messages.add(recieved_msg);
                     conversationListAdapter.notifyDataSetChanged();
-                    message_list.setSelection(messages.size()-1);
                     break;
                 case MESSAGE_SEND:
                     break;

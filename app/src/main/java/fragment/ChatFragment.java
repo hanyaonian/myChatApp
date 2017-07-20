@@ -42,6 +42,7 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setUpListener();
+        getChatList();
     }
     public void initVar() {
         conversation_list = new ArrayList<>();
@@ -127,16 +128,10 @@ public class ChatFragment extends Fragment {
             }
         }
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EMClient.getInstance().chatManager().removeMessageListener(emMessageListener);
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
+        EMClient.getInstance().chatManager().removeMessageListener(emMessageListener);
     }
     private AdapterView.OnItemClickListener chatItemClick = new AdapterView.OnItemClickListener() {
         @Override
