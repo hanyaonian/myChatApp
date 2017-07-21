@@ -1,5 +1,7 @@
 package activity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,12 +15,14 @@ import com.example.dell.wilddogchat.R;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMMessage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import adapter.ConversationListAdapter;
+import db.MyDb;
 
 public class conversation extends BaseActivity {
     private ListView message_list;
@@ -30,6 +34,7 @@ public class conversation extends BaseActivity {
     private ConversationListAdapter conversationListAdapter;
     private static final int MESSAGE_RECIEVE = 1;
     private static final int MESSAGE_SEND = 2;
+    private MyDb db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,8 @@ public class conversation extends BaseActivity {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        //获取数据库
+        db = new MyDb(getApplicationContext(), "db", null, 1);
     }
     //返回按键监听
     @Override
@@ -110,6 +117,12 @@ public class conversation extends BaseActivity {
                     msg.what = MESSAGE_RECIEVE;
                     msg.obj = message;
                     handler.sendMessage(msg);
+                }
+                if (message.getType() == EMMessage.Type.IMAGE) {
+                    String update_user = message.getFrom();
+                    String fileURL = ((EMImageMessageBody)message.getBody()).getLocalUrl();
+                    Bitmap bitmap= BitmapFactory.decodeFile(fileURL);
+                    db.insert(update_user, bitmap);
                 }
             }
         }

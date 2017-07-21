@@ -1,13 +1,65 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="fragment.Personcenter">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
+        <!--头像需要透明背景-->
+        <ImageView
+            android:id="@+id/head_img_butt"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:background="#FFFFFF"
+            app:srcCompat="@drawable/person" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/center_nick_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/head_img_butt"
+            android:layout_centerHorizontal="true"
+            android:text="Hanyn" />
+
+        <Button
+            android:id="@+id/center_set_nickname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/center_setting_listen"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/input_style"
+            android:elevation="8dp"
+            android:text="设置昵称"
+            app:layout_widthPercent="40%" />
+
+        <Button
+            android:id="@+id/center_setting_listen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/center_nick_name"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/input_style"
+            android:elevation="8dp"
+            android:text="开启消息提示：是"
+            app:layout_marginPercent="5%"
+            app:layout_widthPercent="40%" />
+
+        <Button
+            android:id="@+id/center_log_out"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/center_set_nickname"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/input_style"
+            android:elevation="8dp"
+            android:text="注销"
+            android:textColor="#e92138"
+            app:layout_marginPercent="10%"
+            app:layout_widthPercent="40%" />
+    </android.support.percent.PercentRelativeLayout>
+</FrameLayout>

@@ -35,7 +35,6 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //获取对话数据
     }
 
     @Override
@@ -80,7 +79,7 @@ public class ChatFragment extends Fragment {
             //收到消息
             Message msg = new Message();
             msg.what = MESSAGE_RECIEVE;
-            handler.sendMessage(msg);
+            msg.obj = messages;
         }
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {

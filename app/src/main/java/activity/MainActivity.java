@@ -9,10 +9,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.dell.wilddogchat.R;
-import com.hyphenate.chat.EMClient;
 
 import adapter.FragmentAdapter;
-import fragment.ChatFragment;
 
 public class MainActivity extends BaseActivity{
     private ViewPager viewPager;
@@ -44,7 +42,6 @@ public class MainActivity extends BaseActivity{
     //初始化数据
     @Override
     protected void initData() {
-
     }
     //初始化views
     @Override

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.dell.wilddogchat.R;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
 import com.hyphenate.util.DateUtils;
 
 import java.util.ArrayList;
@@ -66,9 +67,13 @@ public class ChatListViewAdapter extends BaseAdapter {
                     new Date(conversations.get(conversation_list.get(position)).getLastMessage().getMsgTime()));
             holder.lastestDate.setText(lastestDate);
             //set last msg
+        if (conversations.get(conversation_list.get(position)).getLastMessage().getType() == EMMessage.Type.IMAGE) {
+            holder.lastestMsg.setText("提示：更新了头像哦");
+        } else {
             String haha = conversations.get(conversation_list.get(position)).getLastMessage().getBody().toString();
             holder.lastestMsg.setText(haha.split("\"")[1]);
-            return convertView;
+        }
+        return convertView;
     }
     @Override
     public Object getItem(int position) {
