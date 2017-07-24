@@ -36,6 +36,7 @@ public class conversation extends BaseActivity {
     private static final int MESSAGE_SEND = 2;
     private MyDb db;
 
+    //TODO:aysnc 加载数据库图片
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
