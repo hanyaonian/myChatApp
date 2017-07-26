@@ -74,7 +74,8 @@
         <activity
             android:name="activity.signup"
             android:label="用户注册" />
-        <activity android:name="activity.conversation"></activity>
+        <activity android:name="activity.conversation"
+            android:theme="@style/SwipeAble"></activity>
     </application>
 
 </manifest>

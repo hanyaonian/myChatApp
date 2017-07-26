@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,8 +24,9 @@ import java.util.List;
 
 import adapter.ConversationListAdapter;
 import db.MyDb;
+import ui.SwipeableActivity;
 
-public class conversation extends BaseActivity {
+public class conversation extends SwipeableActivity {
     private ListView message_list;
     List<EMMessage> messages;
     private EMConversation conversation;
@@ -46,6 +48,9 @@ public class conversation extends BaseActivity {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        initVariables();
+        initViews(savedInstanceState);
+        initData();
         //获取数据库
         db = new MyDb(getApplicationContext(), "db", null, 1);
     }
@@ -60,7 +65,6 @@ public class conversation extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_conversation);
         message_list = (ListView)findViewById(R.id.messagelist);
@@ -68,12 +72,10 @@ public class conversation extends BaseActivity {
         send_butt = (Button)findViewById(R.id.send_msg_butt);
         send_butt.setOnClickListener(send_msg_butt_click);
     }
-    @Override
     protected void initVariables() {
         talkToWho = getIntent().getStringExtra("talkWithWho").toLowerCase();
         setTitle("与 "+talkToWho+ " 对话中");
     }
-    @Override
     protected void initData() {
         conversation =  EMClient.getInstance().chatManager().getConversation(talkToWho, EMConversation.EMConversationType.Chat, false);
         if (conversation != null) {
