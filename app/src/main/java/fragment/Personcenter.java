@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import activity.MainActivity;
+import activity.userlogin;
 import db.MyDb;
 
 
@@ -193,6 +195,8 @@ public class Personcenter extends Fragment {
         public void onClick(View v) {
             EMClient.getInstance().logout(true);
             getActivity().finish();
+            Intent intent = new Intent(getActivity(), userlogin.class);
+            startActivity(intent);
         }
     };
 }

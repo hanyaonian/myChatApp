@@ -19,11 +19,9 @@
             android:textSize="@dimen/dp16"
             android:text="好友请求"/>
         <TextView
-            android:padding="@dimen/dp8"
+            android:layout_marginLeft="@dimen/dp8"
             android:layout_gravity="center_vertical"
             android:id="@+id/unread_new_friend_num"
-            android:visibility="invisible"
-            android:textSize="@dimen/dp16"
             android:background="@color/red"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

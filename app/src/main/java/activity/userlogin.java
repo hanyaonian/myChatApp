@@ -1,5 +1,5 @@
 package activity;
-//TODO:不要让第一次登陆以后双击返回它还在
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.example.dell.wilddogchat.R;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.chat.EMMessage;
 
 public class userlogin extends BaseActivity {
 

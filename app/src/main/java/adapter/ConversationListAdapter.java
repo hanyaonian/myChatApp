@@ -61,7 +61,7 @@ public class ConversationListAdapter extends BaseAdapter {
             return messages.get(position);
         else return null;
     }
-    //TODO:shit, bug here,好像这种模式不一样的不能考虑复用
+    //TODO: 用一个layout装俩对话，通过隐藏另一个的方式来布局复用
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;

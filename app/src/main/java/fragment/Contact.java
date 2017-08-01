@@ -23,24 +23,32 @@ import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import activity.conversation;
 import adapter.ContactListAdapter;
 import ui.IndexSlideBar;
 
+import static com.hyphenate.chat.EMGCMListenerService.TAG;
+
+//TODO:以后蛮闲的时候再把好友请求持久化，现在就先支持一个吧
 public class Contact extends Fragment {
     private ListView contactList;
     private static final int GET_FRIEND_LIST = 1;
     private static final int HEADER_COUNT = 2;
-    private static int UNREAD_FRIEND_INVITE = 0;
     private List<String> friend_list;
+    private Map<String, String> new_friend;
     private ContactListAdapter adapter;
     private IndexSlideBar indexSlideBar;
-    private TextView textDialog;
+    private TextView textDialog, invite_hint;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        friend_list = new ArrayList<>();//initial
+        new_friend = new HashMap<>();
         getFriendList();
     }
     //将list首字母转为大写
@@ -78,6 +86,7 @@ public class Contact extends Fragment {
         textDialog = (TextView)view.findViewById(R.id.text_dialog);
         indexSlideBar = (IndexSlideBar)view.findViewById(R.id.index_slideBar);
         indexSlideBar.setTextView(textDialog);
+        invite_hint = (TextView) view.findViewById(R.id.unread_new_friend_num);
         //headerView
         addHeaderView();
         indexSlideBar.setOnTouchingLetterChangedListener(new IndexSlideBar.OnTouchingLetterChangedListener() {
@@ -155,6 +164,28 @@ public class Contact extends Fragment {
         AlertDialog add_friend_dialog = builder.create();
         add_friend_dialog.show();
     }
+    public void showNewFriendDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("添加好友")
+                .setIcon(R.drawable.search_new)
+                .setMessage(new_friend.get("name") + "说：" +new_friend.get("reason"))
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        invite_hint.setText("");
+                    }
+                })
+                .setPositiveButton("接受", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            EMClient.getInstance().contactManager().acceptInvitation(new_friend.get("name"));
+                        } catch (HyphenateException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
+                });
+    }
     public void addFriend(String name, String reason) {
         try {
             EMClient.getInstance().contactManager().addContact(name, reason);
@@ -168,8 +199,8 @@ public class Contact extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position == 0) {
                 showAddFriendDialog();
-            } else if (position == 1) {
-
+            } else if (position == 1 && new_friend.size() != 0) {
+                showNewFriendDialog();
             } else {
                 Intent intent = new Intent(getActivity(), conversation.class);
                 intent.putExtra("talkWithWho", friend_list.get(position - HEADER_COUNT));
@@ -185,7 +216,7 @@ public class Contact extends Fragment {
             //TODO:无首字母时插入
             //根据首字母插入新好友。。
             String Username = username.substring(0,1).toUpperCase() + username.substring(1);
-            friend_list.add(adapter.getFirstLetterPos(username.toUpperCase().charAt(0)), Username);
+            friend_list.add(getInsertPos(Username.charAt(0)), Username);
             adapter.notifyDataSetChanged();
         }
         @Override
@@ -198,27 +229,34 @@ public class Contact extends Fragment {
         public void onContactInvited(String username, String reason) {
             //发起加为好友用户的名称
             //对方发起好友邀请时发出的文字性描述
-            UNREAD_FRIEND_INVITE += 1;
-            TextView shit = (TextView) getView().findViewById(R.id.unread_new_friend_num);
-            shit.setText(UNREAD_FRIEND_INVITE);
-            shit.setVisibility(View.VISIBLE);
+            new_friend.put("name", username);
+            new_friend.put("reason", reason);
+            invite_hint.setText("新请求");
         }
         @Override
         public void onFriendRequestAccepted(String username) {
             //增加了联系人时回调此方法
+            String Username = username.substring(0,1).toUpperCase() + username.substring(1);
+            friend_list.add(getInsertPos(Username.charAt(0)), Username);
+            adapter.notifyDataSetChanged();
         }
         @Override
         public void onFriendRequestDeclined(String username) {
             //被拒绝时的方法
         }
     };
+    public int getInsertPos(char x) {
+        for (int i = 0; i < friend_list.size(); i++) {
+           if (friend_list.get(i).charAt(0) > x) return i;
+        }
+        return friend_list.size();
+    }
 
     @Override
     public void onResume() {
         super.onResume();
         EMClient.getInstance().contactManager().setContactListener(contactListener);
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();

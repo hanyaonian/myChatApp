@@ -59,6 +59,7 @@
             android:label="用户登录" />
         <activity
             android:name="activity.MainActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" />
         <activity
             android:name="activity.SplashActivity"
