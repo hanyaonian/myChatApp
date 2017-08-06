@@ -1,9 +1,13 @@
 package activity;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +27,7 @@ import java.util.List;
 
 import adapter.ConversationListAdapter;
 import db.MyDb;
+import service.MessageReceiveService;
 import ui.SwipeableActivity;
 
 public class conversation extends SwipeableActivity {
@@ -35,7 +40,20 @@ public class conversation extends SwipeableActivity {
     private ConversationListAdapter conversationListAdapter;
     private static final int MESSAGE_RECIEVE = 1;
     private static final int MESSAGE_SEND = 2;
+    private MessageReceiveService.chatBinder binder;
     private MyDb db;
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            binder = (MessageReceiveService.chatBinder) service;
+            binder.getName(talkToWho);
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            //do nothing
+        }
+    };
 
     //TODO:aysnc 加载数据库图片
     @Override
@@ -52,7 +70,15 @@ public class conversation extends SwipeableActivity {
         initData();
         //获取数据库
         db = new MyDb(getApplicationContext(), "db", null, 1);
+        //监听消息
+        bindSerive();
     }
+
+    public void bindSerive() {
+        Intent intent = new Intent(this, MessageReceiveService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
+    }
+
     //返回按键监听
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -172,6 +198,7 @@ public class conversation extends SwipeableActivity {
             messages = conversation.getAllMessages();
             EMClient.getInstance().chatManager().importMessages(messages);
         }
+        unbindService(connection);
     }
     @Override
     protected void onDestroy() {

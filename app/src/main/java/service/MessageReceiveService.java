@@ -1,14 +1,16 @@
-package com.example.dell.wilddogchat;
+package service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.v4.app.NotificationCompat;
 
+import com.example.dell.wilddogchat.R;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
@@ -21,12 +23,12 @@ import java.util.Set;
 import activity.MainActivity;
 
 public class MessageReceiveService extends Service {
+    chatBinder binder = new chatBinder();
     public MessageReceiveService() {
     }
-
     @Override
     public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return binder;
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -74,7 +76,10 @@ public class MessageReceiveService extends Service {
     EMMessageListener listener = new EMMessageListener() {
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
-            showNotification(messages);
+            //如果收到的消息正在和你聊天，无需提示
+            if (binder.needNotify(messages.get(0).getFrom())) {
+                showNotification(messages);
+            }
         }
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {
@@ -95,5 +100,15 @@ public class MessageReceiveService extends Service {
     };
     public void setListener() {
         EMClient.getInstance().chatManager().addMessageListener(listener);
+    }
+    public class chatBinder extends Binder {
+        public void getName(String username) {
+            name = username;
+        }
+        public boolean needNotify(String from) {
+            if (name.equals(from)) return false;
+            else return true;
+        }
+        public String name = "";
     }
 }

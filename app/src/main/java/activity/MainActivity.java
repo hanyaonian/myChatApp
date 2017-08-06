@@ -10,7 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.dell.wilddogchat.MessageReceiveService;
+import service.MessageReceiveService;
 import com.example.dell.wilddogchat.R;
 
 import adapter.FragmentAdapter;
@@ -24,10 +24,10 @@ public class MainActivity extends BaseActivity{
     private final static int PERSON_POS = 2;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onStart() {
+        super.onStart();
         Intent intent = new Intent(MainActivity.this, MessageReceiveService.class);
-        startService(intent);
+        stopService(intent);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -111,8 +111,11 @@ public class MainActivity extends BaseActivity{
             Toast.makeText(getApplicationContext(), "再次返回退出", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        Intent intent = new Intent(MainActivity.this, MessageReceiveService.class);
+        startService(intent);
     }
 }

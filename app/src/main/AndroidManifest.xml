@@ -80,7 +80,7 @@
             android:theme="@style/SwipeAble" />
 
         <service
-            android:name=".MessageReceiveService"
+            android:name="service.MessageReceiveService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

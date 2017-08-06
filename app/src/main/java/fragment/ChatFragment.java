@@ -79,7 +79,7 @@ public class ChatFragment extends Fragment {
             //收到消息
             Message msg = new Message();
             msg.what = MESSAGE_RECIEVE;
-            msg.obj = messages;
+            handler.sendMessage(msg);
         }
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {
@@ -117,6 +117,10 @@ public class ChatFragment extends Fragment {
             }
         }
     };
+    //TODO:排序一下聊天顺序
+    public void sortList() {
+
+    }
     public void updateList() {
         if (conversations.size() == 0) {
             getChatList();
