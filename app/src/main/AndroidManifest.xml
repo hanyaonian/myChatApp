@@ -59,8 +59,8 @@
             android:label="用户登录" />
         <activity
             android:name="activity.MainActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:launchMode="singleTop" />
         <activity
             android:name="activity.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -75,8 +75,14 @@
         <activity
             android:name="activity.signup"
             android:label="用户注册" />
-        <activity android:name="activity.conversation"
-            android:theme="@style/SwipeAble"></activity>
+        <activity
+            android:name="activity.conversation"
+            android:theme="@style/SwipeAble" />
+
+        <service
+            android:name=".MessageReceiveService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

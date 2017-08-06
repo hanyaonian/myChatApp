@@ -111,7 +111,7 @@ public class Personcenter extends Fragment {
                     //存入
                     db.insert(EMClient.getInstance().getCurrentUser(), img);
                 }
-                sendNewHeadImgToEveryOne(img);
+                //sendNewHeadImgToEveryOne(img);
                 setHeadImg.setImageBitmap(img);
             }
         }
