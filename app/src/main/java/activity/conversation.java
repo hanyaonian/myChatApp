@@ -70,6 +70,11 @@ public class conversation extends SwipeableActivity {
         initData();
         //获取数据库
         db = new MyDb(getApplicationContext(), "db", null, 1);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         //监听消息
         bindSerive();
     }

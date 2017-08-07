@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dell.wilddogchat.R;
 import com.hyphenate.EMContactListener;
@@ -50,6 +51,8 @@ public class Contact extends Fragment {
         friend_list = new ArrayList<>();//initial
         new_friend = new HashMap<>();
         getFriendList();
+        //listener
+        EMClient.getInstance().contactManager().setContactListener(contactListener);
     }
     //将list首字母转为大写
     public List<String> makeFirstUpperCase(List<String> list) {
@@ -77,6 +80,7 @@ public class Contact extends Fragment {
     public void addHeaderView() {
         View contactList_header_new = LayoutInflater.from(getContext()).inflate(R.layout.contact_header_new, null);
         View contactList_header_add = LayoutInflater.from(getContext()).inflate(R.layout.contact_header_add, null);
+        invite_hint = (TextView) contactList_header_new.findViewById(R.id.unread_new_friend_num);
         contactList.addHeaderView(contactList_header_add);
         contactList.addHeaderView(contactList_header_new);
     }
@@ -86,7 +90,6 @@ public class Contact extends Fragment {
         textDialog = (TextView)view.findViewById(R.id.text_dialog);
         indexSlideBar = (IndexSlideBar)view.findViewById(R.id.index_slideBar);
         indexSlideBar.setTextView(textDialog);
-        invite_hint = (TextView) view.findViewById(R.id.unread_new_friend_num);
         //headerView
         addHeaderView();
         indexSlideBar.setOnTouchingLetterChangedListener(new IndexSlideBar.OnTouchingLetterChangedListener() {
@@ -173,6 +176,7 @@ public class Contact extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         invite_hint.setText("");
+                        new_friend.clear();
                     }
                 })
                 .setPositiveButton("接受", new DialogInterface.OnClickListener() {
@@ -180,11 +184,14 @@ public class Contact extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             EMClient.getInstance().contactManager().acceptInvitation(new_friend.get("name"));
+                            new_friend.clear();
                         } catch (HyphenateException e) {
                             Log.e(TAG, e.getMessage());
                         }
                     }
                 });
+        AlertDialog new_friend_dialog = builder.create();
+        new_friend_dialog.show();
     }
     public void addFriend(String name, String reason) {
         try {
@@ -201,6 +208,9 @@ public class Contact extends Fragment {
                 showAddFriendDialog();
             } else if (position == 1 && new_friend.size() != 0) {
                 showNewFriendDialog();
+
+            } else if (position == 1 && new_friend.size() == 0) {
+                Toast.makeText(getContext(), "No new friend", Toast.LENGTH_SHORT).show();
             } else {
                 Intent intent = new Intent(getActivity(), conversation.class);
                 intent.putExtra("talkWithWho", friend_list.get(position - HEADER_COUNT));
@@ -252,11 +262,6 @@ public class Contact extends Fragment {
         return friend_list.size();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        EMClient.getInstance().contactManager().setContactListener(contactListener);
-    }
     @Override
     public void onDestroy() {
         super.onDestroy();
