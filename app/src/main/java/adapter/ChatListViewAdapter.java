@@ -24,16 +24,17 @@ public class ChatListViewAdapter extends BaseAdapter {
     private final Context Appcontext;
     private List<String> conversation_list;
 
-    public ChatListViewAdapter(Context context,Map<String, EMConversation> Conversations){
+    public ChatListViewAdapter(Context context,Map<String, EMConversation> Conversations, List<String> conversationList){
         conversations = Conversations;
         Appcontext = context;
-        conversation_list = new ArrayList<>();
+        conversation_list = conversationList;
+        //conversation_list = new ArrayList<>();
         //无消息的对话，不加入conversation_list
-        for (Map.Entry<String, EMConversation> entry : conversations.entrySet()) {
-            if (entry.getValue().getLastMessage() != null) {
-                conversation_list.add(entry.getKey());
-            }
-        }
+        //for (Map.Entry<String, EMConversation> entry : conversations.entrySet()) {
+        //    if (entry.getValue().getLastMessage() != null) {
+        //        conversation_list.add(entry.getKey());
+        //    }
+        //}
     }
     @Override
     public int getCount() {

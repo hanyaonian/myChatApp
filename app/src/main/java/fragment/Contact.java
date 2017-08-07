@@ -184,6 +184,7 @@ public class Contact extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             EMClient.getInstance().contactManager().acceptInvitation(new_friend.get("name"));
+                            invite_hint.setText("");
                             new_friend.clear();
                         } catch (HyphenateException e) {
                             Log.e(TAG, e.getMessage());

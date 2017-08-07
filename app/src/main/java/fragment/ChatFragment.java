@@ -65,10 +65,10 @@ public class ChatFragment extends Fragment {
     //获取对话列表
     public void getChatList() {
         conversations = EMClient.getInstance().chatManager().getAllConversations();
-        chatListViewAdapter = new ChatListViewAdapter(getContext(), conversations);
-        chatList.setAdapter(chatListViewAdapter);
         //设置好对话名列表
         initVar();
+        chatListViewAdapter = new ChatListViewAdapter(getContext(), conversations, conversation_list);
+        chatList.setAdapter(chatListViewAdapter);
     }
     public void setUpListener() {
         EMClient.getInstance().chatManager().addMessageListener(emMessageListener);
@@ -122,7 +122,8 @@ public class ChatFragment extends Fragment {
 
     }
     public void updateList() {
-        if (conversations.size() == 0) {
+        conversations = EMClient.getInstance().chatManager().getAllConversations();
+        if (conversations.size() > conversation_list.size()) {
             getChatList();
         } else {
             //one
