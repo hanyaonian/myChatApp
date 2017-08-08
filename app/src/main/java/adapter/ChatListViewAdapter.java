@@ -28,13 +28,6 @@ public class ChatListViewAdapter extends BaseAdapter {
         conversations = Conversations;
         Appcontext = context;
         conversation_list = conversationList;
-        //conversation_list = new ArrayList<>();
-        //无消息的对话，不加入conversation_list
-        //for (Map.Entry<String, EMConversation> entry : conversations.entrySet()) {
-        //    if (entry.getValue().getLastMessage() != null) {
-        //        conversation_list.add(entry.getKey());
-        //    }
-        //}
     }
     @Override
     public int getCount() {

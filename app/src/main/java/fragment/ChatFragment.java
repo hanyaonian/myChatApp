@@ -18,6 +18,9 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +44,15 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setUpListener();
-        getChatList();
+        updateList();
     }
+
     public void initVar() {
         conversation_list = new ArrayList<>();
         for (Map.Entry<String, EMConversation> entry : conversations.entrySet()) {
             conversation_list.add(entry.getKey());
         }
+        chatList.setOnItemLongClickListener(chatItemLongClick);
         chatList.setOnItemClickListener(chatItemClick);
     }
     public void bindView(View view) {
@@ -61,12 +66,13 @@ public class ChatFragment extends Fragment {
         getChatList();
         return view;
     }
-
     //获取对话列表
     public void getChatList() {
         conversations = EMClient.getInstance().chatManager().getAllConversations();
         //设置好对话名列表
         initVar();
+        //排序
+        sortList();
         chatListViewAdapter = new ChatListViewAdapter(getContext(), conversations, conversation_list);
         chatList.setAdapter(chatListViewAdapter);
     }
@@ -117,9 +123,18 @@ public class ChatFragment extends Fragment {
             }
         }
     };
-    //TODO:排序一下聊天顺序
-    public void sortList() {
 
+    //排序一下聊天顺序
+    public void sortList() {
+        Collections.sort(conversation_list, new Comparator<String>() {
+            @Override
+            public int compare(String user1, String user2) {
+                if (conversations.get(user1).getLastMessage().getMsgTime() > conversations.get(user2).getLastMessage().getMsgTime())
+                    return -1;
+                else
+                    return 1;
+            }
+        });
     }
     public void updateList() {
         conversations = EMClient.getInstance().chatManager().getAllConversations();
@@ -128,13 +143,15 @@ public class ChatFragment extends Fragment {
         } else {
             //one
             synchronized (this) {
+                //列表数量少时直接再排吧，如果数量多，改成将收到消息的人挪到第一位去
+                sortList();
                 chatListViewAdapter.notifyDataSetChanged();
             }
         }
     }
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         EMClient.getInstance().chatManager().removeMessageListener(emMessageListener);
     }
     private AdapterView.OnItemClickListener chatItemClick = new AdapterView.OnItemClickListener() {
@@ -143,6 +160,13 @@ public class ChatFragment extends Fragment {
             Intent intent = new Intent(getActivity(), conversation.class);
             intent.putExtra("talkWithWho", conversation_list.get(position));
             startActivity(intent);
+        }
+    };
+    //TODO: 删除聊天记录
+    private AdapterView.OnItemLongClickListener chatItemLongClick = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            return false;
         }
     };
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/chat_box_back"/>
+    <padding
+        android:right="@dimen/dp8"
+        android:left="@dimen/dp8"
+        android:bottom="@dimen/dp8"
+        android:top="@dimen/dp5" />
+    <stroke
+        android:color="@color/deep_gray"
+        android:width="1px"/>
+</shape>
