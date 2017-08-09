@@ -1,10 +1,12 @@
 package fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +48,19 @@ public class ChatFragment extends Fragment {
         setUpListener();
         updateList();
     }
+    @Override
+    public void onPause() {
+        super.onPause();
+        EMClient.getInstance().chatManager().removeMessageListener(emMessageListener);
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chat_list, container, false);
+        bindView(view);
+        getChatList();
+        return view;
+    }
 
     public void initVar() {
         conversation_list = new ArrayList<>();
@@ -57,14 +72,6 @@ public class ChatFragment extends Fragment {
     }
     public void bindView(View view) {
         chatList = (ListView)view.findViewById(R.id.chat_list);
-    }
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat_list, container, false);
-        bindView(view);
-        getChatList();
-        return view;
     }
     //获取对话列表
     public void getChatList() {
@@ -149,24 +156,51 @@ public class ChatFragment extends Fragment {
             }
         }
     }
-    @Override
-    public void onPause() {
-        super.onPause();
-        EMClient.getInstance().chatManager().removeMessageListener(emMessageListener);
+    public void startChat(String username) {
+        Intent intent = new Intent(getActivity(), conversation.class);
+        intent.putExtra("talkWithWho", username);
+        startActivity(intent);
     }
+
     private AdapterView.OnItemClickListener chatItemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(getActivity(), conversation.class);
-            intent.putExtra("talkWithWho", conversation_list.get(position));
-            startActivity(intent);
+            startChat(conversation_list.get(position));
         }
     };
     //TODO: 删除聊天记录
     private AdapterView.OnItemLongClickListener chatItemLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            return false;
+            showMenuDialog(conversation_list.get(position));
+            return true;
         }
     };
+    public void showMenuDialog(final String username) {
+        final String[] items = {"和他聊天", "删除对话"};
+        AlertDialog.Builder MenuDialog = new AlertDialog.Builder(getContext());
+        MenuDialog
+                .setCancelable(true)
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                startChat(username);
+                                break;
+                            case 1:
+                                deleteChat(username);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                })
+                .show();
+    }
+    public void deleteChat(String username) {
+        EMClient.getInstance().chatManager().deleteConversation(username, true);
+        conversation_list.remove(username);
+        chatListViewAdapter.notifyDataSetChanged();
+    }
 }

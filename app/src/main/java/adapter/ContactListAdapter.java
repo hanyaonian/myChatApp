@@ -27,7 +27,6 @@ public class ContactListAdapter extends BaseAdapter{
     }
     @Override
     public int getCount() {
-        if(contactList == null) return 0;
         return contactList.size();
     }
     @Override
@@ -37,7 +36,7 @@ public class ContactListAdapter extends BaseAdapter{
 
     @Override
     public Object getItem(int position) {
-        if (contactList == null) return 0;
+        if (contactList.size() == 0) return null;
         return contactList.get(position);
     }
 
@@ -54,9 +53,11 @@ public class ContactListAdapter extends BaseAdapter{
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        String userName = contactList.get(position);
-        holder.userName.setText(userName);
-        holder.userHeadImg.setImageResource(R.drawable.person);
+        if (contactList.size() > 0) {
+            String userName = contactList.get(position);
+            holder.userName.setText(userName);
+            holder.userHeadImg.setImageResource(R.drawable.person);
+        }
         return convertView;
     }
     //使用holder可以避免频繁的创建项

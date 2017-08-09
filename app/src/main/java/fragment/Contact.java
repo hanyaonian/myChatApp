@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import activity.conversation;
 import adapter.ContactListAdapter;
@@ -39,6 +38,7 @@ import static com.hyphenate.chat.EMGCMListenerService.TAG;
 public class Contact extends Fragment {
     private ListView contactList;
     private static final int GET_FRIEND_LIST = 1;
+    private static final int FRIND_DELETED = -1;
     private static final int HEADER_COUNT = 2;
     private List<String> friend_list;
     private Map<String, String> new_friend;
@@ -53,6 +53,19 @@ public class Contact extends Fragment {
         getFriendList();
         //listener
         EMClient.getInstance().contactManager().setContactListener(contactListener);
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().contactManager().removeContactListener(contactListener);
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_contact, container, false);
+        bindView(view);
+        return view;
     }
     //将list首字母转为大写
     public List<String> makeFirstUpperCase(List<String> list) {
@@ -69,14 +82,6 @@ public class Contact extends Fragment {
         Collections.sort(sorted_list);
         return sorted_list;
     }
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_contact, container, false);
-        bindView(view);
-        return view;
-    }
     public void addHeaderView() {
         View contactList_header_new = LayoutInflater.from(getContext()).inflate(R.layout.contact_header_new, null);
         View contactList_header_add = LayoutInflater.from(getContext()).inflate(R.layout.contact_header_add, null);
@@ -87,6 +92,7 @@ public class Contact extends Fragment {
     public void bindView(View view) {
         contactList = (ListView)view.findViewById(R.id.contact_list);
         contactList.setOnItemClickListener(contact_item_click);
+        contactList.setOnItemLongClickListener(contact_item_longClick);
         textDialog = (TextView)view.findViewById(R.id.text_dialog);
         indexSlideBar = (IndexSlideBar)view.findViewById(R.id.index_slideBar);
         indexSlideBar.setTextView(textDialog);
@@ -130,6 +136,10 @@ public class Contact extends Fragment {
                     List<String> temp = (List<String>) msg.obj;
                     setContactList(temp);
                     break;
+                case FRIND_DELETED:
+                    String friendName = (String) msg.obj;
+                    friend_list.remove(friendName);
+                    adapter.notifyDataSetChanged();
                 default:
                     break;
             }
@@ -194,6 +204,51 @@ public class Contact extends Fragment {
         AlertDialog new_friend_dialog = builder.create();
         new_friend_dialog.show();
     }
+    public void showMenuDialog(final String friendName) {
+        final String[] items = {"与他聊天", "删除好友"};
+        AlertDialog.Builder MenuDialog = new AlertDialog.Builder(getContext());
+        MenuDialog
+                .setCancelable(true)
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                startChat(friendName);
+                                break;
+                            case 1:
+                                deleteFriend(friendName);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                })
+                .show();
+    }
+    public void deleteFriend(final String friendName) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    EMClient.getInstance().contactManager().deleteContact(friendName);
+                    Message msg = new Message();
+                    msg.obj = friendName;
+                    msg.what = FRIND_DELETED;
+                    handler.sendMessage(msg);
+                } catch (HyphenateException e) {
+                    Log.e("delete friend: ", e.getMessage());
+                } catch (Exception e) {
+                    Log.e("delete friend: ", e.toString());
+                }
+            }
+        }).start();
+    }
+    public void startChat(String username) {
+        Intent intent = new Intent(getActivity(), conversation.class);
+        intent.putExtra("talkWithWho", username);
+        startActivity(intent);
+    }
     public void addFriend(String name, String reason) {
         try {
             EMClient.getInstance().contactManager().addContact(name, reason);
@@ -213,27 +268,34 @@ public class Contact extends Fragment {
             } else if (position == 1 && new_friend.size() == 0) {
                 Toast.makeText(getContext(), "No new friend", Toast.LENGTH_SHORT).show();
             } else {
-                Intent intent = new Intent(getActivity(), conversation.class);
-                intent.putExtra("talkWithWho", friend_list.get(position - HEADER_COUNT));
-                startActivity(intent);
+                if (friend_list.size() == 0) return;
+               startChat(friend_list.get(position - HEADER_COUNT));
             }
+        }
+    };
+    private AdapterView.OnItemLongClickListener contact_item_longClick = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            if (position > 1 && friend_list.size() > 0) {
+                showMenuDialog(friend_list.get(position - 2));
+            }
+            return true;
         }
     };
     //contact listener
     private EMContactListener contactListener = new EMContactListener() {
         @Override
         public void onContactAdded(String username) {
-            //增加了联系人时回调此方法
-            //TODO:无首字母时插入
             //根据首字母插入新好友。。
             String Username = username.substring(0,1).toUpperCase() + username.substring(1);
-            friend_list.add(getInsertPos(Username.charAt(0)), Username);
+            if (!friend_list.contains(Username))
+                friend_list.add(getInsertPos(Username.charAt(0)), Username);
             adapter.notifyDataSetChanged();
         }
         @Override
         public void onContactDeleted(String username) {
             //TODO:被删除时回调此方法
-            friend_list.remove(username);
+            if (friend_list.contains(username)) friend_list.remove(username);
             adapter.notifyDataSetChanged();
         }
         @Override
@@ -257,15 +319,11 @@ public class Contact extends Fragment {
         }
     };
     public int getInsertPos(char x) {
-        for (int i = 0; i < friend_list.size(); i++) {
-           if (friend_list.get(i).charAt(0) > x) return i;
+        if (friend_list.size() > 0) {
+            for (int i = 0; i < friend_list.size(); i++) {
+                if (friend_list.get(i).charAt(0) > x) return i;
+            }
         }
         return friend_list.size();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        EMClient.getInstance().contactManager().removeContactListener(contactListener);
     }
 }
