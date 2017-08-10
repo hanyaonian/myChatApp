@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.example.dell.wilddogchat.R;
 import com.hyphenate.EMMessageListener;
@@ -25,19 +26,19 @@ import com.hyphenate.chat.EMMessage;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapter.ConversationListAdapter;
+import adapter.ConversationAdapter;
 import db.MyDb;
 import service.MessageReceiveService;
 import ui.SwipeableActivity;
 
 public class conversation extends SwipeableActivity {
-    private ListView message_list;
+    private RecyclerView message_list;
     List<EMMessage> messages;
     private EMConversation conversation;
     private EditText input_box;
     private Button send_butt;
     private String talkToWho;
-    private ConversationListAdapter conversationListAdapter;
+    private ConversationAdapter conversationAdapter;
     private static final int MESSAGE_RECIEVE = 1;
     private static final int MESSAGE_SEND = 2;
     private MessageReceiveService.chatBinder binder;
@@ -97,7 +98,7 @@ public class conversation extends SwipeableActivity {
 
     protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_conversation);
-        message_list = (ListView)findViewById(R.id.messagelist);
+        message_list = (RecyclerView) findViewById(R.id.messagelist);
         input_box = (EditText)findViewById(R.id.message_content);
         send_butt = (Button)findViewById(R.id.send_msg_butt);
         send_butt.setOnClickListener(send_msg_butt_click);
@@ -124,7 +125,7 @@ public class conversation extends SwipeableActivity {
                 EMMessage message = EMMessage.createTxtSendMessage(content, talkToWho);
                 EMClient.getInstance().chatManager().sendMessage(message);
                 messages.add(message);
-                conversationListAdapter.notifyDataSetChanged();
+                conversationAdapter.notifyDataSetChanged();
             }
         }
     };
@@ -135,8 +136,11 @@ public class conversation extends SwipeableActivity {
         } else {
             messages = new ArrayList<>();
         }
-        conversationListAdapter = new ConversationListAdapter(messages, getApplicationContext());
-        message_list.setAdapter(conversationListAdapter);
+        conversationAdapter = new ConversationAdapter(getApplicationContext(), messages);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        message_list.setLayoutManager(layoutManager);
+        layoutManager.setStackFromEnd(true);
+        message_list.setAdapter(conversationAdapter);
     }
 
     private EMMessageListener messageListener = new EMMessageListener() {
@@ -184,7 +188,7 @@ public class conversation extends SwipeableActivity {
                 case MESSAGE_RECIEVE:
                     EMMessage recieved_msg = (EMMessage) msg.obj;
                     messages.add(recieved_msg);
-                    conversationListAdapter.notifyDataSetChanged();
+                    conversationAdapter.notifyDataSetChanged();
                     break;
                 case MESSAGE_SEND:
                     break;

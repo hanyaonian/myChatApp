@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/friend_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <ImageView
+            android:id="@+id/conversation_friend_headImg"
+            android:layout_margin="@dimen/dp8"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+        <com.github.library.bubbleview.BubbleTextView
+            android:id="@+id/conversation_friend_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hello, bubble"
+            android:layout_toRightOf="@+id/conversation_friend_headImg"
+            android:padding="10dp"
+            android:layout_marginTop="@dimen/dp16"
+            android:layout_marginRight="@dimen/dp16"
+            android:textColor="@android:color/background_dark"
+            app:arrowWidth="8dp"
+            app:angle="8dp"
+            app:arrowHeight="10dp"
+            app:arrowPosition="14dp"
+            app:arrowLocation="left"
+            app:arrowCenter="true"
+            app:bubbleColor="#11331111"/>
+    </RelativeLayout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/my_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <ImageView
+            android:id="@+id/conversation_my_headImg"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="@dimen/dp8"
+            android:layout_alignParentRight="true"
+            />
+        <com.github.library.bubbleview.BubbleTextView
+            android:id="@+id/conversation_my_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hello，bubble here"
+            android:layout_toLeftOf="@+id/conversation_my_headImg"
+            android:padding="10dp"
+            android:layout_marginTop="@dimen/dp16"
+            android:layout_marginLeft="@dimen/dp16"
+            android:textColor="@android:color/background_dark"
+            app:arrowWidth="8dp"
+            app:angle="8dp"
+            app:arrowHeight="10dp"
+            app:arrowPosition="14dp"
+            app:arrowLocation="right"
+            app:arrowCenter="true"
+            app:bubbleColor="#afffaf"/>
+    </RelativeLayout>
+</RelativeLayout>
