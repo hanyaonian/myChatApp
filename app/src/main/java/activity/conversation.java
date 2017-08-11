@@ -108,7 +108,7 @@ public class conversation extends SwipeableActivity {
         setTitle("与 "+talkToWho+ " 对话中");
         EMConversation conversation = EMClient.getInstance().chatManager().getConversation(talkToWho);
         //指定会话消息未读数清零
-        conversation.markAllMessagesAsRead();
+        if (conversation != null) conversation.markAllMessagesAsRead();
     }
     protected void initData() {
         conversation =  EMClient.getInstance().chatManager().getConversation(talkToWho, EMConversation.EMConversationType.Chat, false);
