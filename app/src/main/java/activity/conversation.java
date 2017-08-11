@@ -106,6 +106,9 @@ public class conversation extends SwipeableActivity {
     protected void initVariables() {
         talkToWho = getIntent().getStringExtra("talkWithWho").toLowerCase();
         setTitle("与 "+talkToWho+ " 对话中");
+        EMConversation conversation = EMClient.getInstance().chatManager().getConversation(talkToWho);
+        //指定会话消息未读数清零
+        conversation.markAllMessagesAsRead();
     }
     protected void initData() {
         conversation =  EMClient.getInstance().chatManager().getConversation(talkToWho, EMConversation.EMConversationType.Chat, false);
@@ -126,6 +129,7 @@ public class conversation extends SwipeableActivity {
                 EMClient.getInstance().chatManager().sendMessage(message);
                 messages.add(message);
                 conversationAdapter.notifyDataSetChanged();
+                message_list.smoothScrollToPosition(messages.size()-1);
             }
         }
     };

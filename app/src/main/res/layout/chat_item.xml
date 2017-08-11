@@ -36,10 +36,24 @@
             android:layout_height="wrap_content"
             android:textColor="@color/deep_gray" />
     </RelativeLayout>
-    <TextView
-        android:id="@+id/latest_message_date"
-        android:layout_marginTop="@dimen/dp5"
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_weight="3"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/latest_message_date"
+            android:layout_marginTop="@dimen/dp5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/unread_message_num"
+            android:layout_below="@+id/latest_message_date"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dp5"
+            android:background="@drawable/unread_circleshape"
+            android:layout_width="wrap_content"
+            android:visibility="invisible"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 </LinearLayout>
